@@ -1,0 +1,197 @@
+<html>
+
+<head>
+	<title>ReadMe - EnterMedia clients</title>
+	<style type="text/css">
+	.code {font-family: monospace;}
+	ul.commandlist span {font-family: monospace;}
+	.center {margin: 0 auto; text-align: center;}
+	</style>
+</head>
+
+<body>
+<p>This software is intended as a set of example EnterMedia clients.</p>
+<p>This software is licenced under the terms of the 
+<a href="http://www.opensource.org/licenses/lgpl-3.0.html">GNU Lesser
+General Public License v3</a></p>
+
+<h1>Java Client</h1>
+<p>Right now this is the only client available in this bundle.</p>
+<p>It includes source code, build file for Apache Ant and a sample run script
+for Unix. The client can be run using the main method in the 
+<span class="code">org.openedit.entermedia.ui.ConsoleClient</span>. All the JAR
+files in the lib directory must be included in the class path. If you're running
+any Unix-style operating system you can use the <span class="code">javaclient.sh</span>
+sample script. It will for a <span class="code">JAVA_HOME</span> environment
+variable and include the JAR files in the class path. You can run it with sh, bash
+or any other shell.</p>
+
+<h2>Usage</h2>
+<p>The basic usage syntax is: </p>
+<div class="center code">javaclient.sh -command &lt;command&gt; [-option &lt;value&gt; ...]</div>
+<p>Here is a simple list of possible commands and its options.
+Some options have default values so can be omitted. Options without a default value
+are required, and Java exceptions will be thrown if not specified:</p>
+<ul class="commandlist">
+	<li><span>listCatalogs</span>: displays a list of catalogs for a
+	specific EnterMedia application. Options:
+		<ul>
+			<li><span>applicationid</span>: the id of the EnterMedia application.
+				Defaults to <span>media</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>createCatalog</span>: creates a new catalog in a
+	specific EnterMedia application. Options:
+		<ul>
+			<li><span>applicationid</span>: the id of the EnterMedia application.
+				Defaults to <span>media</span>.</li>
+			<li><span>catalogname</span>: the name for the new catalog. 
+				Example: <span>new catalog</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>listCategories</span>: displays a list of categories for a
+	specific parent category. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the catalog. Defaults to
+			<span>media/catalogs/photo</span>.</li>
+			<li><span>categoryid</span>: the id of the parent category. Defaults to
+			<span>index</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>listSearch</span>: searches for any data type in an EnterMedia
+		application or catalog. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the EnterMedia application or catalog.
+				Defaults to <span>media/catalogs/photo</span>.</li>
+			<li><span>searchtype</span>: an EnterMedia search type.
+				Example: <span>fileformat</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>searchAssets</span>: searches a catalog for assets. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the EnterMedia catalog.
+				Defaults to <span>media/catalogs/photo</span>.</li>
+			<li><span>search</span>: a search query string. A sequence of comma-separated
+				<span>field operation value</span> groups where <span>field</span> can be
+				any asset property (see <span>config/assetproperties.xml</span> in your catalog);
+				<span>value</span> is the value to compare and <span>operation</span> depends
+				on the field's data type:
+				<ul>
+					<li>for text fields: <span>matches, exact, startswith, not</span></li>
+					<li>for dates: <span>before, after, equals</span></li>
+					<li>for numbers: <span>greaterthannumber, lessthannumber, equaltonumber</span></li>				
+				</ul>
+				<span>search</span> defaults to <span>id matches *</span>.</li>
+			
+		</ul>
+	</li>
+	
+	<li><span>assetDetails</span>: displays an asset's metadata. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the EnterMedia catalog.
+				Defaults to <span>media/catalogs/photo</span>.</li>
+			<li><span>id</span>: the asset's ID.
+				Example: <span>108</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>saveAsset</span>: modifies an asset's metadata. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the EnterMedia catalog.
+				Defaults to <span>media/catalogs/photo</span>.</li>
+			<li><span>id</span>: the asset's ID.
+				Example: <span>115</span>.</li>
+			<li><span>values</span>: a comma-separated string with <span>field=value</span>
+				pairs. 
+				Example: <span>name=test name,caption=test caption</span>.</li>
+		</ul>
+	</li>
+	
+	<li><span>upload</span>: uploads an asset to an EnterMedia catalog. Options:
+		<ul>
+			<li><span>catalogid</span>: the id of the EnterMedia catalog.
+				Defaults to <span>media/catalogs/photo</span>.</li>
+			<li><span>sourcepath</span>: a base path structure to put the asset in.
+				Defaults to <span>users/<i>username</i></span>.</li>
+			<li><span>file</span>: local path to the file.
+				Example: <span>/home/user/photo.jpg</span> or <span>c:\documents\invoice.pdf</span>.</li>
+		</ul>
+	</li>
+	<li>Global options:
+		<ul>
+			<li><span>serverurl</span>: the EnterMedia server's URL. Must end with a slash (/).
+				Defaults to <span>http://demo.entermediasoftware.com/</span>.
+			</li>
+			<li><span>restpath</span>: path to the EnterMedia's REST API.
+				Defaults to <span>/services/rest</span>.
+			</li>
+			<li><span>username</span>: the EnterMedia user to log in.
+				Defaults to <span>admin</span>.
+			</li>
+			<li><span>password</span>: the EnterMedia user's password.
+				Defaults to <span>admin</span>.
+			</li>
+		</ul>
+	</li>
+</ul>
+
+<h2>Examples</h2>
+
+<p>Upload an image to a server running in the local machine and then get the new asset's metadata:</p>
+
+<pre>
+oedit@bodoque:~/entermedia-clients$ sh javaclient.sh -command upload -serverurl http://localhost:8080/ -file ~/assets/dog.jpg
+131: users/admin/dog.jpg/131
+
+1 results.
+oedit@bodoque:~/entermedia-clients$ sh javaclient.sh -serverurl http://localhost:8080/ -command assetDetails -id 131
+name=dog.jpg
+id=131
+width=1800
+colortype=GRAYSCALE
+datatype=Original
+yresolution=96
+sourcepath=users/admin/dog.jpg/131
+xresolution=96
+height=1215
+assetmodificationdate=2010-03-26 12:02:25
+</pre>
+
+<p>Search for an asset with <span class="code">dog</span> in it's name and set the caption to
+<span class="code">Happy dog</span>.</p>
+
+<pre>
+oedit@bodoque:~/entermedia-clients$ sh javaclient.sh -serverurl http://localhost:8080/ -command searchAssets -search name matches "dog*"
+107:
+	fileformat=JPEG
+	fileformatid=jpeg
+	name=dog.jpg
+	sourcepath=users/admin/dog.jpg/107
+	id=107
+
+1 results.
+
+oedit@bodoque:~/entermedia-clients$ sh javaclient.sh -serverurl http://localhost:8080/ -command saveAsset -id 107 -values caption=Happy dog
+caption=Happy dog
+
+oedit@bodoque:~/entermedia-clients$ sh javaclient.sh -serverurl http://localhost:8080/ -command assetDetails -id 107
+name=dog.jpg
+id=107
+width=1800
+colortype=GRAYSCALE
+datatype=Original
+yresolution=96
+sourcepath=users/admin/dog.jpg/107
+xresolution=96
+height=1215
+caption=Happy dog
+assetmodificationdate=2010-03-26 15:50:36
+</pre>
+
+</body>
+
+</html>
