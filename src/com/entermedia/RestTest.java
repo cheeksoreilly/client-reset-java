@@ -39,7 +39,7 @@ public class RestTest extends TestCase
 	
 	protected String getDefaultCatalogId()
 	{
-		return "media/catalogs/photo";
+		return "media/catalogs/public";
 	}
 	
 	/**
@@ -230,7 +230,10 @@ public class RestTest extends TestCase
 		
 		Part[] parts = { 
 				new FilePart("file", f.getName(), f),
-				new StringPart("sourcepath", "users/admin/")
+				new StringPart("sourcepath", "users/admin/"),
+				new StringPart("field", "caption"),
+				new StringPart("caption.value", "Testing")
+				//new StringPart("libraries", "client1")  //This can be used to enforce security
 		};
 		
 		method.setRequestEntity( new MultipartRequestEntity(parts, method.getParams()) ); 
