@@ -1,4 +1,4 @@
-package com.entermedia;
+package com.entermedia.test;
 
 
 import java.io.File;
@@ -22,58 +22,8 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-public class RestTest extends TestCase
+public class RestTest extends BaseTestCase
 {
-	HttpClient fieldClient;
-
-	protected String getServerUrl()
-	{
-		return "http://demo.entermediasoftware.com/";
-		//return "http://localhost:8080/";
-	}
-	
-	protected String getDefaultApplicationId()
-	{
-		return "media";
-	}
-	
-	protected String getDefaultCatalogId()
-	{
-		return "media/catalogs/public";
-	}
-	
-	/**
-	 * The web services API require a client to log first. 
-	 * The login is the same as one used within the EnterMedia usermanager
-	 * There are two Cookies that need to be passed in on subsequent requests
-	 * 1. JSESSIONID - This is used by resin or similar Java container. Enables short term sessions on the server
-	 * 2. entermedia.key - This allows the user to be auto-logged in. Useful for long term connections. 
-	 * 	  If the web server is restarted then clients don't need to log in again
-	 * @throws Exception
-	 */
-	public HttpClient getClient() throws Exception
-	{
-		
-		if (fieldClient == null)
-		{
-			fieldClient = new HttpClient();
-			PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/login.xml");
-			method.addParameter(new NameValuePair("accountname", "admin"));
-			method.addParameter(new NameValuePair("password", "admin"));
-
-			int statusCode = fieldClient.executeMethod(method);
-			assertEquals(200, statusCode);
-
-			Element root = getXml(method.getResponseBodyAsStream());
-
-			assertNotNull(root);
-			String ok = root.attributeValue("stat");
-			assertEquals("ok", ok);
-
-		}
-		return fieldClient;
-	}
-
 	/**
 	 * listing the available catalogs on the server for this user. A catalog ID is in the form of
 	 * media/catalogs/documents - Application ID / "catalogs" / Catalog Name
@@ -85,7 +35,7 @@ public class RestTest extends TestCase
 		int statusCode = getClient().executeMethod(method);
 		assertEquals(200, statusCode); //Make sure auto login works
 		Element root = getXml(method.getResponseBodyAsStream());
-		assertTrue(root.elements().size() > 2);
+		assertTrue(root.elements().size() > 0);
 	}
 
 	/**
@@ -504,38 +454,4 @@ public class RestTest extends TestCase
 		assertFalse("modification time for thumbs must be different", modified1.getValue().equals(modified2.getValue()));
 	}
 	
-	protected Element getXml(InputStream inXmlReader)
-	{
-		try
-		{
-			SAXReader reader = new SAXReader();
-			reader.setEncoding("UTF-8");
-			Document document = reader.read(new InputStreamReader(inXmlReader,"UTF-8"));
-			Element root = document.getRootElement();
-			return root;
-		}
-		catch (Exception ex)
-		{
-			throw new RuntimeException(ex);
-		}
-	}
-	
-	protected Element getElementById(Element inElement, String inId)
-	{
-		if(inElement == null || inId == null)
-		{
-			return null;
-		}
-		
-		for(Iterator i = inElement.elementIterator(); i.hasNext();)
-		{
-			Element e = (Element) i.next();
-			if(inId.equals(e.attributeValue("id")))
-			{
-				return e;
-			}
-		}
-		
-		return null;
-	}
 }
