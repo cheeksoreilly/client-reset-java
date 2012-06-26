@@ -2,6 +2,8 @@ package com.entermedia.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,9 +28,10 @@ public class LoadTest extends BaseTestCase
 	long jobid = new Date().getTime();
 	int jobtype = 1;
 	int sequence = 1;
-	int sent = 0;
+	long sent = 0;
 	int failed = 0;
 	ThreadLocal perthread = new ThreadLocal();
+	long startjob = System.currentTimeMillis();
 	
 	public void testUploading() throws Exception
 	{
@@ -49,7 +52,7 @@ public class LoadTest extends BaseTestCase
 		}
 		runner.shutdown();
 		runner.awaitTermination(30L, TimeUnit.MINUTES);
-		System.out.println("completed: sent :  " + sent + " failed:" + failed );
+		log("completed: sent :  " + sent + " failed:" + failed );
 		assertTrue(failed == 0);
 	}
 	
@@ -57,10 +60,10 @@ public class LoadTest extends BaseTestCase
 	{
 		try
 		{ 
+			long id = jobid++;
 			PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/upload.xml?catalogid=" + getDefaultCatalogId());
 
-			jobid++;
-			String fullid = String.valueOf(jobid);
+			String fullid = String.valueOf(id);
 			StringBuffer sourcepath = new StringBuffer();
 			for (int i = 0; i < fullid.length(); i++)
 			{
@@ -73,7 +76,7 @@ public class LoadTest extends BaseTestCase
 			sourcepath.append("/" + jobtype + "_" + sequence );
 			
 			List<Part> customparts = new ArrayList<Part>();
-			customparts.add( new FilePart("file", jobid + f.getName(), f) );
+			customparts.add( new FilePart("file", id + f.getName(), f) );
 			
 			customparts.add( new StringPart("sourcepath", sourcepath.toString()) );
 			customparts.addAll( getParts() );
@@ -92,7 +95,14 @@ public class LoadTest extends BaseTestCase
 				assertNotNull(asset.attributeValue("id"));
 				sent++;
 				long end = System.currentTimeMillis();
-				log(sent + " returned in " + (end-start) + " milliseconds");
+				long diff = (end - startjob);
+				if( diff > 1000 )
+				{
+					BigDecimal timesofar =  new BigDecimal(diff).divide( new BigDecimal(60000L),4,RoundingMode.HALF_UP );
+					BigDecimal assetspermin = new BigDecimal(sent).divide(timesofar,4,RoundingMode.HALF_UP);
+					log(sent + " returned in " + (end-start) + " milliseconds " + assetspermin + " assets per minute" );
+				}
+				
 			}
 			finally
 			{
