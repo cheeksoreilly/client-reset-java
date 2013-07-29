@@ -202,13 +202,28 @@ public class RestTest extends BaseTestCase
 	 */
 	public void testListSearch() throws Exception
 	{
-		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/search.xml");
+		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/datasearch.xml");
 		method.addParameter(new NameValuePair("catalogid", getDefaultCatalogId()));
-		method.addParameter(new NameValuePair("searchtype", "uploadstatus"));		
+		method.addParameter(new NameValuePair("searchtype", "fileformat"));
+		method.addParameter(new NameValuePair("hitsperpage", "3"));
+		
 		int statusCode = getClient().executeMethod(method);
 		assertEquals(200, statusCode); 
 		Element root = getXml(method.getResponseBodyAsStream());
-		assertTrue(root.elements().size() > 2);
+		Element hits = (Element)root.elements().get(0);
+		assertTrue(hits.elements().size() > 2);
+		
+		String sessionid = hits.attributeValue("sessionid");
+
+		method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/datagetpage.xml");
+		method.addParameter(new NameValuePair("catalogid", getDefaultCatalogId()));
+		method.addParameter(new NameValuePair("searchtype", "fileformat"));
+		method.addParameter(new NameValuePair("hitssessionid", sessionid));
+		method.addParameter(new NameValuePair("page", "2"));
+		statusCode = getClient().executeMethod(method);
+		assertEquals(200, statusCode); 
+
+		
 		
 		method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/search.xml");
 		method.addParameter(new NameValuePair("catalogid", "system"));
@@ -217,6 +232,8 @@ public class RestTest extends BaseTestCase
 		assertEquals(200, statusCode); 
 		root = getXml(method.getResponseBodyAsStream());
 		assertTrue( root.elements().size() > 0);
+		
+			
 	}
 	
 	/**
@@ -365,7 +382,7 @@ public class RestTest extends BaseTestCase
 	/**
 	 * Test clients join data
 	 */
-	public void NOTUSEDtestJoinData() throws Exception
+	public void testJoinData() throws Exception
 	{
 		// Add client 1 to an asset
 		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/savedata.xml");
@@ -377,6 +394,11 @@ public class RestTest extends BaseTestCase
 		method.addParameter("clientid.value", "1");	
 		int statusCode = getClient().executeMethod(method);
 		assertEquals(200, statusCode);
+
+		Element droot = getXml(method.getResponseBodyAsStream());
+		Element data = (Element)droot.element("data");
+		assertNotNull( data.attributeValue("id") );
+		
 		
 		// Reindex asset
 		method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/saveassetdetails.xml");
