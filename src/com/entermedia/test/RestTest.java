@@ -176,7 +176,8 @@ public class RestTest extends BaseTestCase
 	{
 		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/upload.xml?catalogid=" + getDefaultCatalogId());
 
-		File f = new File("etc/testasset.jpg"); 
+		File f = new File("etc/testasset.jpg");
+		//File f = new File("etc/artbeats_red_m480pSMALL.mov");
 		
 		Part[] parts = { 
 				new FilePart("file", f.getName(), f),
@@ -475,5 +476,74 @@ public class RestTest extends BaseTestCase
 		
 		assertFalse("modification time for thumbs must be different", modified1.getValue().equals(modified2.getValue()));
 	}
+
+	public void testListAttachments() throws Exception
+	{
+		PostMethod method = new PostMethod( getServerUrl() + getDefaultApplicationId() + "/services/rest/attachments/listattachments.xml?catalogid=" + getDefaultCatalogId());
+		method.addParameter(new NameValuePair("parentsourcepath", "HotFolder/originals/originals/photos/Puppy.jpg"));
+
+		int statusCode = getClient().executeMethod(method);
+		assertEquals(200, statusCode);
+		Element root = getXml(method.getResponseBodyAsStream());
+		
+		//System.out.println( root.asXML() );
+		assertTrue(root.elements().size() > 0);
+	}
+
+	public void testAttachFiles() throws Exception
+	{
+		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/attachments/uploadattachment.xml?catalogid=" + getDefaultCatalogId());
+
+		File f = new File("etc/testasset.jpg"); 
+		
+		Part[] parts = { 
+				new FilePart("file", f.getName(), f),
+				new StringPart("assetid", "101")
+		};
+		
+		method.setRequestEntity( new MultipartRequestEntity(parts, method.getParams()) ); 
+
+		int statusCode = getClient().executeMethod(method);
+		assertEquals(200, statusCode); 
+		
+		Element root = getXml(method.getResponseBodyAsStream());
+		Element asset = (Element)root.elementIterator("asset").next();
+		assertNotNull(asset.attributeValue("id"));
+	}
+	public void testReplacePrimary() throws Exception
+	{
+		PostMethod method = new PostMethod(getServerUrl() + getDefaultApplicationId() + "/services/rest/attachments/uploadprimary.xml?catalogid=" + getDefaultCatalogId());
+
+		File f = new File("etc/testasset.jpg"); 
+		
+		Part[] parts = { 
+				new FilePart("file", "new" + f.getName(), f),
+				new StringPart("assetid", "101")
+		};
+		
+		method.setRequestEntity( new MultipartRequestEntity(parts, method.getParams()) ); 
+
+		int statusCode = getClient().executeMethod(method);
+		assertEquals(200, statusCode); 
+		
+		Element root = getXml(method.getResponseBodyAsStream());
+		Element asset = (Element)root.elementIterator("asset").next();
+		assertNotNull(asset.attributeValue("id"));
+	}
+	public void testListVersions() throws Exception
+	{
+		PostMethod method = new PostMethod( getServerUrl() + getDefaultApplicationId() + "/services/rest/repository/getversions.xml");
+		method.addParameter(new NameValuePair("editPath", "/WEB-INF/data/media/catalogs/public/originals/newassets/admin/101/newtestasset.jpg"));
+
+		int statusCode = getClient().executeMethod(method);
+		assertEquals(200, statusCode);
+		Element root = getXml(method.getResponseBodyAsStream());
+		
+		//System.out.println( root.asXML() );
+		assertTrue(root.elements().size() > 0);
+	}
+
+	
+
 	
 }
